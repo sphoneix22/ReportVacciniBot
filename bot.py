@@ -68,7 +68,8 @@ def get_data(update, context):
         driver.quit()
 
 def info(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Questo bot non fa altro che leggere la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza.\n Creato da @Bananaglassata")
+    context.bot.send_message(chat_id=update.effective_chat.id, parse_mode=telegram.ParseMode.MARKDOWN,
+        text="Questo bot non fa altro che leggere la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza.\n Creato da @Bananaglassata\n [Github](https://github.com/sphoneix22/ReportVacciniBot)")
 
 def main():
     updater = Updater(token=os.environ.get("TELEGRAM_TOKEN"), use_context=True) 
