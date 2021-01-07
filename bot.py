@@ -15,6 +15,14 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Per visualizzare il report più aggiornato sui vaccini usa il comando /report")
 
+def convert_number(number):
+    new_number = ""
+    for d in number:
+        if d not in (",", '.'):
+            new_number += d
+    return int(new_number)
+
+
 def get_data(update, context):
     last_usage = context.user_data.get('LastUse')
     if last_usage is None or last_usage +60 <= time.time():
@@ -64,7 +72,53 @@ def get_data(update, context):
         msg += f"*Totali*: {totale['somministrate']} dosi somministrate di {totale['consegnate']} consegnate ({totale['percentuale_somministrate']})\n\n"
 
         msg += f"Aggiornamento delle {data_update}"
+
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=telegram.ParseMode.MARKDOWN)
+    
+        URL_LAZIO = os.environ.get("URL_LAZIO")
+        URL_PIEMONTE = os.environ.get("URL_PIEMONTE")
+        URL_EMILIAROMAGNA = os.environ.get("URL_EMILIAROMAGNA")
+
+        # Lazio scraping
+        driver.get(URL_LAZIO)
+        data_lazio = convert_number(driver.find_element_by_xpath("//b").text)
+        if data_lazio > convert_number(regioni['Lazio']['somministrate']):
+            additional_lazio = data_lazio - convert_number(regioni['Lazio']['somministrate'])
+        else:
+            additional_lazio = 0
+
+        # Piemonte scraping
+        driver.get(URL_PIEMONTE)
+        raw_data_piemonte = driver.find_element_by_class_name("field--name-title").text
+        data_piemonte = ""
+        for l in raw_data_piemonte:
+            if l not in (" "):
+                data_piemonte += l
+            else:
+                break
+
+        data_piemonte = convert_number(data_piemonte)
+
+        if data_piemonte > convert_number(regioni['Piemonte']['somministrate']):
+            additional_piemonte = data_piemonte - convert_number(regioni['Piemonte']['somministrate'])
+        else:
+            additional_piemonte = 0
+
+        # ER scraping
+        driver.get(URL_EMILIAROMAGNA)
+        data_emiliaromagna = convert_number(driver.find_element_by_class_name("valore").text)
+        if data_emiliaromagna > convert_number(regioni['Emilia-Romagna']['somministrate']):
+            additional_emiliaromagna = data_emiliaromagna - convert_number(regioni['Emilia-Romagna']['somministrate'])
+        else:
+            additional_emiliaromagna = 0
+
+        total_additional = additional_lazio + additional_piemonte + additional_emiliaromagna
+        if total_additional == 0:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Non ci sono ulteriori dati aggiornati da parte delle regioni.", parse_mode=telegram.ParseMode.MARKDOWN)
+        else:
+            additional_msg = f"*Stima dati aggiornati in base alle comunicazioni delle regioni:*\n{convert_number(totale['somministrate']) + total_additional} dosi somministrate\n(Questo dato potrebbe non essere accurato.)"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=additional_msg, parse_mode=telegram.ParseMode.MARKDOWN)
+
     finally:
         driver.quit()
 
