@@ -26,7 +26,8 @@ def get_data(update, context):
     URL = os.environ.get("REPORT_URL")
 
     option = webdriver.ChromeOptions()
-    option.binary_location = os.getenv("GOOGLE_CHROME_BIN")
+    if os.getenv("HEROKU", False):
+        option.binary_location = os.getenv("GOOGLE_CHROME_BIN")
     option.add_argument("--headless")
     option.add_argument('--disable-gpu')
     option.add_argument('--no-sandbox')
@@ -80,8 +81,11 @@ def main():
     dispatcher.add_handler(CommandHandler('report', get_data))
     dispatcher.add_handler(CommandHandler('info', info))
 
-    updater.start_webhook(listen="0.0.0.0", port=os.environ.get("PORT"), url_path=os.environ.get("TELEGRAM_TOKEN"))
-    updater.bot.setWebhook("https://reportvaccini.herokuapp.com/" + os.environ.get("TELEGRAM_TOKEN"))
+    if os.getenv("HEROKU", False):
+        updater.start_webhook(listen="0.0.0.0", port=os.getenv("PORT"), url_path=os.getenv("TELEGRAM_TOKEN"))
+        updater.bot.setWebhook(os.getenv("HEROKU_LINK")+os.getenv("TELEGRAM_TOKEN"))
+    else:
+        updater.start_polling()
 
 if __name__ == '__main__':
     main()
