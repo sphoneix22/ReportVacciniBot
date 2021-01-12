@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -25,12 +26,12 @@ def convert_number(number):
 
 def get_data(update, context):
     last_usage = context.user_data.get('LastUse')
-    if last_usage is None or last_usage +60 <= time.time():
+    if last_usage is None or last_usage + 180 <= time.time():
         context.user_data['LastUse'] = time.time()
     else:
-        return context.bot.send_message(chat_id=update.effective_chat.id, text="Per favore attendi, puoi usare il comando solo ogni 60 secondi.")
+        return context.bot.send_message(chat_id=update.effective_chat.id, text="Per favore attendi, puoi usare il comando solo ogni 3 minuti.")
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Attendi un instante...", parse_mode=telegram.ParseMode.MARKDOWN)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Sto cercando i dati. Questo può richiedere fino a qualche minuto...", parse_mode=telegram.ParseMode.MARKDOWN)
     URL = os.environ.get("REPORT_URL")
 
     option = webdriver.ChromeOptions()
@@ -65,7 +66,7 @@ def get_data(update, context):
 
         totale = {'somministrate': data[89].text, 'consegnate': data[90].text, 'percentuale_somministrate': data[91].text}
 
-        msg = ''
+        msg = '*Report ufficiale vaccinazioni anti COVID-19:\n'
 
         for regione in regioni:
             msg += f"*{regione}*: {regioni[regione]['somministrate']} dosi somministrate di {regioni[regione]['consegnate']} consegnate ({regioni[regione]['percentuale_somministrate']})\n"
@@ -78,6 +79,7 @@ def get_data(update, context):
         URL_LAZIO = os.environ.get("URL_LAZIO")
         URL_PIEMONTE = os.environ.get("URL_PIEMONTE")
         URL_EMILIAROMAGNA = os.environ.get("URL_EMILIAROMAGNA")
+        URL_TOSCANA = os.environ.get("URL_TOSCANA")
 
         # Lazio scraping
         driver.get(URL_LAZIO)
@@ -112,19 +114,33 @@ def get_data(update, context):
         else:
             additional_emiliaromagna = 0
 
-        total_additional = additional_lazio + additional_piemonte + additional_emiliaromagna
+        # Toscana scraping
+        driver.get(URL_TOSCANA)
+        data_toscana = convert_number(WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'inner'))
+        ).find_element_by_css_selector("h3").text)
+
+        if data_toscana > convert_number(regioni['Toscana']['somministrate']):
+            addional_toscana = data_toscana - convert_number(regioni['Toscana']['somministrate'])
+        else:
+            addional_toscana = 0
+
+        total_additional = additional_lazio + additional_piemonte + additional_emiliaromagna + addional_toscana
         if total_additional == 0:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Non ci sono ulteriori dati aggiornati da parte delle regioni.", parse_mode=telegram.ParseMode.MARKDOWN)
         else:
             additional_msg = f"*Stima dati aggiornati in base alle comunicazioni delle regioni:*\n{convert_number(totale['somministrate']) + total_additional} dosi somministrate\n(Questo dato potrebbe non essere accurato.)"
             context.bot.send_message(chat_id=update.effective_chat.id, text=additional_msg, parse_mode=telegram.ParseMode.MARKDOWN)
 
+    except TimeoutException:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Si è verificato un errore nel recupero dei dati.")
     finally:
         driver.quit()
 
+
 def info(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, parse_mode=telegram.ParseMode.MARKDOWN,
-        text="Questo bot non fa altro che leggere la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza.\n Creato da @Bananaglassata\n [Github](https://github.com/sphoneix22/ReportVacciniBot)")
+        text="Questo bot legge la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza e quelle di alcune regioni. (Al momento Toscana, Emilia-Romagna, Lazio e Piemonte)\n Creato da @Bananaglassata\n [Github](https://github.com/sphoneix22/ReportVacciniBot)")
 
 def main():
     updater = Updater(token=os.environ.get("TELEGRAM_TOKEN"), use_context=True) 
