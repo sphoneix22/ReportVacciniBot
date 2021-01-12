@@ -1,12 +1,22 @@
-# Required env variables
+# Come funziona il bot
+Tramite Selenium effettua uno scraping sulla pagina del report vaccini anti COVID-19.
+Al momento il link alla pagina è [questo](https://app.powerbi.com/view?r=eyJrIjoiMzg4YmI5NDQtZDM5ZC00ZTIyLTgxN2MtOTBkMWM4MTUyYTg0IiwidCI6ImFmZDBhNzVjLTg2NzEtNGNjZS05MDYxLTJjYTBkOTJlNDIyZiIsImMiOjh9).
 
+### Dati dalle regioni
+Alcune regioni pubblicano i dati sui vaccinati prima che vengano inseriti sul report nazionale.
+Al momento il bot è in grado di recupare i dati della Regione [Toscana](https://vaccinazioni.sanita.toscana.it), [Emilia-Romagna](https://reportvaccinianticovid19er.lepida.it/), [Lazio](https://www.salutelazio.it/avvio-della-campagna-di-vaccinazione-anti-covid-19), [Piemonte](https://www.regione.piemonte.it/web/pinforma/notizie/22203-persone-finora-vaccinate-contro-covid?fbclid=IwAR08RnwxdI-_tt-p1Ex9jO2HsSjAT-AIIwqK2YKDMsOFEooE2tt6SYegQhY).
+
+# Come utilizzare il bot
+Il bot è utilizzabile col tag `@reportvaccinibot` su Telegram.
+
+Per avviarlo in locale, dopo aver installato i prerequisiti e inserito le seguenti variabili d'ambiente è sufficiente avviare il file `bot.py`
+```
 "TELEGRAM_TOKEN"
 "REPORT_URL"
 "PORT":"25565"
-"GOOGLE_CHROME_BIN" only heroku
 "CHROME_EXECUTABLE_PATH"
 "URL_LAZIO"
 "URL_PIEMONTE"
 "URL_EMILIAROMAGNA"
-"HEROKU" true/false
-"HEROKU_LINK"
+"URL_TOSCANA"
+```
