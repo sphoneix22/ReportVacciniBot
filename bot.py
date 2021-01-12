@@ -66,7 +66,7 @@ def get_data(update, context):
 
         totale = {'somministrate': data[89].text, 'consegnate': data[90].text, 'percentuale_somministrate': data[91].text}
 
-        msg = '*Report ufficiale vaccinazioni anti COVID-19:\n'
+        msg = '*Report ufficiale vaccinazioni anti COVID-19*:\n'
 
         for regione in regioni:
             msg += f"*{regione}*: {regioni[regione]['somministrate']} dosi somministrate di {regioni[regione]['consegnate']} consegnate ({regioni[regione]['percentuale_somministrate']})\n"
