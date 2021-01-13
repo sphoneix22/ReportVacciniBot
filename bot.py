@@ -55,7 +55,7 @@ def get_data(update, context):
         data = driver.find_elements_by_css_selector('.pivotTableCellWrap')
         
         #1/5/2021 5:45:18 PM
-        data_update = datetime.datetime.strptime(d.text, '%d/%m/%Y %I:%M:%S %p')
+        #data_update = datetime.datetime.strptime(d.text, '%d/%m/%Y %I:%M:%S %p')
 
         regioni = {}
 
@@ -72,7 +72,7 @@ def get_data(update, context):
             msg += f"*{regione}*: {regioni[regione]['somministrate']} dosi somministrate di {regioni[regione]['consegnate']} consegnate ({regioni[regione]['percentuale_somministrate']})\n"
         msg += f"*Totali*: {totale['somministrate']} dosi somministrate di {totale['consegnate']} consegnate ({totale['percentuale_somministrate']})\n\n"
 
-        msg += f"Aggiornamento delle {data_update}"
+        #msg += f"Aggiornamento delle {data_update}"
 
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=telegram.ParseMode.MARKDOWN)
     
