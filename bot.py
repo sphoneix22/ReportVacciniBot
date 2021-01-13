@@ -76,18 +76,18 @@ def get_data(update, context):
 
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=telegram.ParseMode.MARKDOWN)
     
-        URL_LAZIO = os.environ.get("URL_LAZIO")
+        #URL_LAZIO = os.environ.get("URL_LAZIO")
         URL_PIEMONTE = os.environ.get("URL_PIEMONTE")
         URL_EMILIAROMAGNA = os.environ.get("URL_EMILIAROMAGNA")
         URL_TOSCANA = os.environ.get("URL_TOSCANA")
 
         # Lazio scraping
-        driver.get(URL_LAZIO)
-        data_lazio = convert_number(driver.find_element_by_xpath("//b").text)
-        if data_lazio > convert_number(regioni['Lazio']['somministrate']):
-            additional_lazio = data_lazio - convert_number(regioni['Lazio']['somministrate'])
-        else:
-            additional_lazio = 0
+        #driver.get(URL_LAZIO)
+        #data_lazio = convert_number(driver.find_element_by_xpath("//b").text)
+        #if data_lazio > convert_number(regioni['Lazio']['somministrate']):
+        #    additional_lazio = data_lazio - convert_number(regioni['Lazio']['somministrate'])
+        #else:
+        #    additional_lazio = 0
 
         # Piemonte scraping
         driver.get(URL_PIEMONTE)
@@ -125,7 +125,7 @@ def get_data(update, context):
         else:
             addional_toscana = 0
 
-        total_additional = additional_lazio + additional_piemonte + additional_emiliaromagna + addional_toscana
+        total_additional =  + additional_piemonte + additional_emiliaromagna + addional_toscana
         if total_additional == 0:
             context.bot.send_message(chat_id=update.effective_chat.id, text="Non ci sono ulteriori dati aggiornati da parte delle regioni.", parse_mode=telegram.ParseMode.MARKDOWN)
         else:
@@ -140,7 +140,7 @@ def get_data(update, context):
 
 def info(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, parse_mode=telegram.ParseMode.MARKDOWN,
-        text="Questo bot legge la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza e quelle di alcune regioni. (Al momento Toscana, Emilia-Romagna, Lazio e Piemonte)\n Creato da @Bananaglassata\n [Github](https://github.com/sphoneix22/ReportVacciniBot)")
+        text="Questo bot legge la pagina web del report vaccinazioni anti COVID-19 del Commissario Straordinario per l'Emergenza e quelle di alcune regioni. (Al momento Toscana, Emilia-Romagna e Piemonte)\n Creato da @Bananaglassata\n [Github](https://github.com/sphoneix22/ReportVacciniBot)")
 
 def main():
     updater = Updater(token=os.environ.get("TELEGRAM_TOKEN"), use_context=True) 
