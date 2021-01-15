@@ -59,10 +59,10 @@ def get_data(update, context):
 
         regioni = {}
 
-        # Da Abruzzo a Valle d'Aosta i dati sono tutti in fila, per qualche motivo quelli del Veneto sono in fondo
+        # Da Abruzzo a Valle d'Aosta i dati sono tutti in fila, per qualche motivo quelli della Calabria sono in fondo
         for row in range(4, 24):
             regioni[data[row].text] = {'somministrate': data[row+21].text, 'consegnate': data[row+41].text, 'percentuale_somministrate': data[row+61].text}
-        regioni['Veneto'] = {'somministrate': data[85].text, 'consegnate': data[86].text, 'percentuale_somministrate': data[87].text} 
+        regioni['Calabria'] = {'somministrate': data[85].text, 'consegnate': data[86].text, 'percentuale_somministrate': data[87].text} 
 
         totale = {'somministrate': data[89].text, 'consegnate': data[90].text, 'percentuale_somministrate': data[91].text}
 
