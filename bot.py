@@ -137,7 +137,8 @@ def get_data(update, context):
             additional_msg = f"*Stima dati aggiornati in base alle comunicazioni delle regioni:*\n{convert_number(totale['somministrate']) + total_additional} dosi somministrate\n(Questo dato potrebbe non essere accurato.)"
             context.bot.send_message(chat_id=update.effective_chat.id, text=additional_msg, parse_mode=telegram.ParseMode.MARKDOWN)
 
-    except TimeoutException:
+    except Exception as e:
+        print(e)
         context.bot.send_message(chat_id=update.effective_chat.id, text="Si è verificato un errore nel recupero dei dati.")
     finally:
         driver.quit()
